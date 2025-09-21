@@ -1,9 +1,6 @@
 const http = require('http')
 
-let requestCount = 0
-
 const server = http.createServer((req, res) => {
-    requestCount++
     switch (req.url) {
         case '/students': res.write('Students!')
             break
@@ -11,7 +8,6 @@ const server = http.createServer((req, res) => {
             break
         default: res.write('404')
     }
-    res.write(' Hey Yo! ' + requestCount)
     res.end()
 })
 
