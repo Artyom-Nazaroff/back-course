@@ -1,14 +1,14 @@
 import express from 'express';
 const app = express();
-const port = 3003;
+const port = process.env.PORT || 5000;
 
 const HTTP_STATUSES = {
-    OK_200: 200,
-    CREATED_201: 201,
-    NO_CONTENT_204: 204,
-    BAD_REQUEST_400: 400,
-    NOT_FOUND_404: 404,
-    INTERNAL_SERVER_ERROR_500: 500
+	OK_200: 200,
+	CREATED_201: 201,
+	NO_CONTENT_204: 204,
+	BAD_REQUEST_400: 400,
+	NOT_FOUND_404: 404,
+	INTERNAL_SERVER_ERROR_500: 500,
 } as const;
 
 const db = {
@@ -24,6 +24,9 @@ const db = {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/', (req, res) => {
+	res.send('Hello there!');
+});
 app.get('/courses', (req, res) => {
 	let foundCourses = db.courses;
 	if (req.query.title) {
@@ -82,7 +85,9 @@ app.put('/courses/:id', (req, res) => {
 // Обработка ошибок
 app.use((err: any, req: any, res: any, next: any) => {
 	console.error(err.stack);
-	res.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500).send('Что-то пошло не так!');
+	res.status(HTTP_STATUSES.INTERNAL_SERVER_ERROR_500).send(
+		'Что-то пошло не так!'
+	);
 });
 
 app.listen(port, () => {
