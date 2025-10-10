@@ -1,5 +1,5 @@
 import express from 'express';
-const app = express();
+export const app = express();
 const port = process.env.PORT || 5000;
 
 const HTTP_STATUSES = {
@@ -13,10 +13,10 @@ const HTTP_STATUSES = {
 
 const db = {
 	courses: [
-		{ id: 1, title: 'front-end' },
-		{ id: 2, title: 'back-end' },
-		{ id: 3, title: 'design' },
-		{ id: 4, title: 'devops' },
+		// { id: 1, title: 'front-end' },
+		// { id: 2, title: 'back-end' },
+		// { id: 3, title: 'design' },
+		// { id: 4, title: 'devops' },
 	],
 };
 
