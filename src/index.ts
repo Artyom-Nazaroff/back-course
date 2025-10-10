@@ -2,7 +2,7 @@ import express from 'express';
 export const app = express();
 const port = process.env.PORT || 5000;
 
-const HTTP_STATUSES = {
+export const HTTP_STATUSES = {
 	OK_200: 200,
 	CREATED_201: 201,
 	NO_CONTENT_204: 204,
@@ -13,10 +13,10 @@ const HTTP_STATUSES = {
 
 const db = {
 	courses: [
-		// { id: 1, title: 'front-end' },
-		// { id: 2, title: 'back-end' },
-		// { id: 3, title: 'design' },
-		// { id: 4, title: 'devops' },
+		{ id: 1, title: 'front-end' },
+		{ id: 2, title: 'back-end' },
+		{ id: 3, title: 'design' },
+		{ id: 4, title: 'devops' },
 	],
 };
 
@@ -80,6 +80,11 @@ app.put('/courses/:id', (req, res) => {
 	foundCourse.title = req.body.title;
 
 	res.json(foundCourse);
+});
+
+app.delete('/__test__/data', (req, res) => {
+	db.courses = [];
+	res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 });
 
 // Обработка ошибок
