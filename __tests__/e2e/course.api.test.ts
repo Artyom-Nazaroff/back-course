@@ -14,7 +14,7 @@ describe('GET /courses', () => {
 		await request(app).get('/courses/99999').expect(404);
 	});
 
-  let createdCourse: any;
+	let createdCourse: any;
 
 	it('should create a course with correct data', async () => {
 		const response = await request(app)
@@ -29,10 +29,35 @@ describe('GET /courses', () => {
 			title: 'new course',
 		});
 	});
+
 	it('should not update the course', async () => {
 		const response = await request(app)
+			.put('/courses/' + -100)
+			.send({ title: 'qwerty' })
+			.expect(HTTP_STATUSES.NOT_FOUND_404);
+	});
+
+	it('should update the course with correct data', async () => {
+		await request(app)
 			.put('/courses/' + createdCourse.id)
-			.send({ title: '' })
-			.expect(HTTP_STATUSES.BAD_REQUEST_400);
+			.send({ title: 'new title' })
+			.expect(HTTP_STATUSES.OK_200);
+
+		await request(app)
+			.get('/courses/' + createdCourse.id)
+			.expect(HTTP_STATUSES.OK_200, {
+				...createdCourse,
+				title: 'new title',
+			});
+	});
+
+	it('should delete the course', async () => {
+		await request(app)
+			.delete('/courses/' + createdCourse.id)
+			.expect(HTTP_STATUSES.NO_CONTENT_204);
+
+		await request(app)
+			.get('/courses/' + createdCourse.id)
+			.expect(HTTP_STATUSES.NOT_FOUND_404);
 	});
 });
