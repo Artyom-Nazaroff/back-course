@@ -1,4 +1,4 @@
-export interface URIParamsCourseIdModel {
+export interface TURIParamsCourseIdModel {
   /**
    * existed course ID
    */

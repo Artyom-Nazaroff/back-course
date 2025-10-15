@@ -1,4 +1,4 @@
-export interface CoursesQueryModel {
+export interface TCoursesQueryModel {
   /**
    * This title should be included to the search title
    */

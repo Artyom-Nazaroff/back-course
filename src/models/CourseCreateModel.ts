@@ -1,4 +1,4 @@
-export interface CourseCreateModel {
+export interface TCourseCreateModel {
   /**
    * Course title
    */

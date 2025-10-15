@@ -1,9 +1,11 @@
 import { beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
-import { app } from '../../src';
-import { HTTP_STATUSES } from '../../src';
-import type { CourseCreateModel } from '../../src/models/CourseCreateModel.js';
-import type { CourseUpdateModel } from '../../src/models/CourseUpdateModel.js';
+import { app } from '../../app.js';
+import type {
+	TCourseCreateModel,
+	TCourseUpdateModel,
+} from '../../models/index.js';
+import { HTTP_STATUSES } from '../../constants/index.js';
 
 describe('GET /courses', () => {
 	beforeAll(async () => {
@@ -19,7 +21,7 @@ describe('GET /courses', () => {
 	let createdCourse: any;
 
 	it('should create a course with correct data', async () => {
-		const data: CourseCreateModel = { title: 'new course' };
+		const data: TCourseCreateModel = { title: 'new course' };
 
 		const response = await request(app)
 			.post('/courses')
@@ -35,7 +37,7 @@ describe('GET /courses', () => {
 	});
 
 	it('should not update the course', async () => {
-		const data: CourseUpdateModel = { title: 'qwerty' };
+		const data: TCourseUpdateModel = { title: 'qwerty' };
 
 		await request(app)
 			.put('/courses/' + -100)
@@ -44,7 +46,7 @@ describe('GET /courses', () => {
 	});
 
 	it('should update the course with correct data', async () => {
-    const data: CourseUpdateModel = { title: 'new title' };
+		const data: TCourseUpdateModel = { title: 'new title' };
 
 		await request(app)
 			.put('/courses/' + createdCourse.id)
