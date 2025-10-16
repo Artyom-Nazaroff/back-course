@@ -1,4 +1,4 @@
-import express, { type Response } from 'express';
+import express, { type Response, Router } from 'express';
 import type {
 	TRequestWithBody,
 	TRequestWithParams,
@@ -14,16 +14,11 @@ import type {
 	TCourseViewModel,
 	TURIParamsCourseIdModel,
 } from '../models/index.js';
-
-const getCourseViewModel = (course: TCourseViewModel): TCourseViewModel => {
-	return {
-		id: course.id,
-		title: course.title,
-	};
-};
+import { CoursesRepository } from '../repositories/courses.js';
 
 export const addCoursesRouter = (db: TDb) => {
-	const router = express.Router();
+	const router = Router();
+  const repo = new CoursesRepository(db);
 
 	router.get(
 		'/',
@@ -31,26 +26,21 @@ export const addCoursesRouter = (db: TDb) => {
 			req: TRequestWithQuery<TCoursesQueryModel>,
 			res: Response<TCourseViewModel[]>
 		) => {
-			let foundCourses = db.courses;
-			if (req.query.title) {
-				foundCourses = foundCourses.filter(
-					(el) => el.title.indexOf(req.query.title as string) > -1
-				);
-			}
-			res.json(foundCourses.map(getCourseViewModel));
+			const title = req.query.title ? req.query.title.toString() : null;
+			const foundCourses = repo.list(title);
+			res.json(foundCourses);
 		}
 	);
 	router.get(
 		'/:id',
 		(req: TRequestWithParams<TURIParamsCourseIdModel>, res: Response) => {
-			const foundCourse = db.courses.find((el) => el.id === +req.params.id);
+			const foundCourse = repo.getById(req.params.id);
 
 			if (!foundCourse) {
 				res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 				return;
 			}
-
-			res.json(getCourseViewModel(foundCourse));
+			res.json(foundCourse);
 		}
 	);
 	router.post(
@@ -64,23 +54,16 @@ export const addCoursesRouter = (db: TDb) => {
 				return;
 			}
 
-			const createdCourse: TCourseViewModel = {
-				id: +new Date(),
-				title: req.body.title,
-				studentsAmount: 0,
-			};
-			db.courses.push(createdCourse);
-			res.status(HTTP_STATUSES.CREATED_201).json(
-				getCourseViewModel(createdCourse)
-			);
+			const createdCourse = repo.create(req.body.title);
+			res.status(HTTP_STATUSES.CREATED_201).json(createdCourse);
 		}
 	);
 	router.delete(
 		'/:id',
 		(req: TRequestWithParams<TURIParamsCourseIdModel>, res) => {
-			db.courses = db.courses.filter((el) => el.id !== +req.params.id);
-
-			res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+			const isDeleted = repo.delete(req.params.id);
+			if (isDeleted) res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
+			else res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 		}
 	);
 	router.put(
@@ -97,16 +80,14 @@ export const addCoursesRouter = (db: TDb) => {
 				return;
 			}
 
-			const foundCourse = db.courses.find((el) => el.id === +req.params.id);
+			const updated = { title: req.body.title };
+			const foundCourse = repo.update(req.params.id, updated);
 
 			if (!foundCourse) {
 				res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 				return;
 			}
-
-			foundCourse.title = req.body.title;
-
-			res.json(getCourseViewModel(foundCourse));
+			res.json(foundCourse);
 		}
 	);
 
