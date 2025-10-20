@@ -23,13 +23,14 @@ export class CoursesRepository {
 		return c ? this.toViewModel(c) : null;
 	}
 
-	create(title: string): TCourseViewModel {
+	async create(title: string): Promise<TCourseViewModel> {
 		const created = {
 			id: +new Date(),
 			title,
 			studentsAmount: 0,
 		} as TCourseViewModel;
-		this.db.courses.push(created);
+    // Сейчас await ни на что не влияет, но это до тех пор, пока не подключу сюда БД
+		await this.db.courses.push(created);
 		return this.toViewModel(created);
 	}
 

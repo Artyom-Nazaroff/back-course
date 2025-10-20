@@ -1,4 +1,4 @@
-import express, { type Response, Router } from 'express';
+import { type Response, Router } from 'express';
 import type {
 	TRequestWithBody,
 	TRequestWithParams,
@@ -15,10 +15,17 @@ import type {
 	TURIParamsCourseIdModel,
 } from '../models/index.js';
 import { CoursesRepository } from '../repositories/courses.js';
+import { body, validationResult } from 'express-validator';
+import { titleValidationMiddleware } from '../middlewares/validation/inputValidation.js';
+
+const titleValidation = body('title')
+	.trim()
+	.isLength({ min: 3, max: 100 })
+	.withMessage('Title length should be from 3 to 100 symbols');
 
 export const addCoursesRouter = (db: TDb) => {
 	const router = Router();
-  const repo = new CoursesRepository(db);
+	const repo = new CoursesRepository(db);
 
 	router.get(
 		'/',
@@ -45,16 +52,19 @@ export const addCoursesRouter = (db: TDb) => {
 	);
 	router.post(
 		'/',
-		(
+		titleValidation,
+		titleValidationMiddleware,
+		async (
 			req: TRequestWithBody<TCourseCreateModel>,
 			res: Response<TCourseViewModel>
 		) => {
-			if (!req.body.title.trim()) {
-				res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
+			const result = validationResult(req);
+			if (!result.isEmpty()) {
+				res.send({ errors: result.array() });
 				return;
 			}
 
-			const createdCourse = repo.create(req.body.title);
+			const createdCourse = await repo.create(req.body.title);
 			res.status(HTTP_STATUSES.CREATED_201).json(createdCourse);
 		}
 	);

@@ -1,5 +1,6 @@
 export interface TCourseViewModel {
-	id: number;
-	title: string;
-  studentsAmount?: number;
+	id?: number;
+	title?: string;
+	studentsAmount?: number;
+	errors?: any;
 }
