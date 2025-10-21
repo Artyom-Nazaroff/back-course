@@ -29,19 +29,24 @@ export const addCoursesRouter = (db: TDb) => {
 
 	router.get(
 		'/',
-		(
+		async (
 			req: TRequestWithQuery<TCoursesQueryModel>,
 			res: Response<TCourseViewModel[]>
 		) => {
 			const title = req.query.title ? req.query.title.toString() : null;
-			const foundCourses = repo.list(title);
+			const foundCourses = await repo.list(title);
+      console.log(321, foundCourses);
+      
 			res.json(foundCourses);
 		}
 	);
 	router.get(
 		'/:id',
-		(req: TRequestWithParams<TURIParamsCourseIdModel>, res: Response) => {
-			const foundCourse = repo.getById(req.params.id);
+		async (
+			req: TRequestWithParams<TURIParamsCourseIdModel>,
+			res: Response
+		) => {
+			const foundCourse = await repo.getById(req.params.id);
 
 			if (!foundCourse) {
 				res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
@@ -70,20 +75,20 @@ export const addCoursesRouter = (db: TDb) => {
 	);
 	router.delete(
 		'/:id',
-		(req: TRequestWithParams<TURIParamsCourseIdModel>, res) => {
-			const isDeleted = repo.delete(req.params.id);
+		async (req: TRequestWithParams<TURIParamsCourseIdModel>, res) => {
+			const isDeleted = await repo.delete(req.params.id);
 			if (isDeleted) res.sendStatus(HTTP_STATUSES.NO_CONTENT_204);
 			else res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
 		}
 	);
 	router.put(
 		'/:id',
-		(
+		async (
 			req: TRequestWithParamsAndBody<
 				TURIParamsCourseIdModel,
 				TCourseUpdateModel
 			>,
-			res: Response<TCourseViewModel>
+			res: Response<boolean>
 		) => {
 			if (!req.body.title.trim()) {
 				res.sendStatus(HTTP_STATUSES.BAD_REQUEST_400);
@@ -91,7 +96,7 @@ export const addCoursesRouter = (db: TDb) => {
 			}
 
 			const updated = { title: req.body.title };
-			const foundCourse = repo.update(req.params.id, updated);
+			const foundCourse = await repo.update(req.params.id, updated);
 
 			if (!foundCourse) {
 				res.sendStatus(HTTP_STATUSES.NOT_FOUND_404);
